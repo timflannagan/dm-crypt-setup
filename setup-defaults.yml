@@ -1,0 +1,16 @@
+---
+- set_fact:
+    state: "present"
+
+- set_fact:
+    device_name: "test1"
+
+- set_fact:
+    device_type: "mapper"
+
+- set_fact:
+    lvm_vg: "foo"
+
+- set_fact:
+    device_path: "/dev/mapper/{{ lvm_vg }}-{{ device_name }}"
+  when: device_type == "mapper"

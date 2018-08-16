@@ -1,0 +1,22 @@
+---
+- hosts: localhost
+  become: yes
+
+  tasks:
+    - name: Define variables
+      include_tasks: "setup-defaults.yml"
+
+    - debug: var=ansible_mounts
+
+    - name: Print out mount info
+      set_fact:
+        debug_info: "{{ ansible_mounts|selectattr('device', 'equalto', device_path)|first }}"
+
+    - debug:
+        var: debug_info
+
+    # - name: Setup crypt device
+    #   cryptab:
+    #     name: "{{ device_name }}"
+    #     state: "{{ state }}"
+    #   when: state == "present" and device_name not in ansible_mounts.devices
