@@ -1,0 +1,24 @@
+---
+- name: Setup luks device
+  expect:
+    command: cryptsetup -q luksFormat {{ device_path }}
+    responses:
+      'Enter passphrase for /dev/mapper/foo-test2:': "ThisIsSecure"
+
+- name: Open luks device
+  expect:
+    command: cryptsetup -q luksOpen {{ device_path }} {{ device_name }}
+    responses:
+      'Enter passphrase for /dev/mapper/foo-test2:': "ThisIsSecure"
+
+- name: Create fs signature
+  filesystem:
+    dev: "/dev/mapper/{{ device_name }}"
+    fstype: "{{ fs_type }}"
+
+- name: Mount luks device
+  mount:
+    src: "/dev/mapper/{{ device_name }}"
+    path: "{{ mount_point }}"
+    fstype: "{{ fs_type }}"
+    state: "{{ state }}"
