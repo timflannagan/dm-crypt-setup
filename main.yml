@@ -9,8 +9,8 @@
 
     - name: Setup fs-type
       set_fact:
-        fs_type: 'reiserfs'
-
+        fs_type: 'ext4'
+    #
     - name: Setup device name
       set_fact:
         device_name: 'luks-test'
@@ -21,30 +21,42 @@
 
     - name: Setup state variable
       set_fact:
-        state: 'present'
+        state: 'absent'
 
     - name: Setup default mount flag
       set_fact:
         mount_device: true
 
     - name: Setup luks device
-      command: cryptsetup --verbose --batch-mode luksFormat {{ device_path }}
+      expect:
+        command: cryptsetup -q luksFormat {{ device_path }}
+        responses:
+          'Enter passphrase for /dev/foo/test2:': "ThisIsSecure"
       when: state == "present"
+
+    - name: Remove luks key
+      command: cryptsetup luksRemoveKey /dev/mapper/{{ device_name }}
+      when: state == "absent"
+
+    - name: Remove luks volume
+      expect:
+        command: cryptsetup -q remove {{ device_path }}
+        responses:
+          'Enter passphrase for {{ device_path}}:': "ThisIsSecure"
+      when: state == "absent"
 
     - name: Open luks device
-      command: cryptsetup luksOpen {{ device_path }} {{ device_name }}
+      expect:
+        command: cryptsetup luksOpen {{ device_path }} {{ device_name }}
+        responses:
+          'Enter passphrase for /dev/foo/test2:': "ThisIsSecure"
       when: state == "present"
 
+    # Install pexpect using pip
     - name: Create fs signature
       filesystem:
         dev: "/dev/mapper/{{ device_name }}"
         fstype: "{{ fs_type }}"
-      when: state == "present"
-
-    - name: Stat the created device
-      stat:
-        path: '/dev/mapper/{{ device_name }}'
-      register: device_status
       when: state == "present"
 
     - name: Mount luks device
@@ -53,4 +65,4 @@
         path: "{{ mount_point }}"
         fstype: "{{ fs_type }}"
         state: "{{ state }}"
-      when: mount_device and state == "present" and device_status.exists
+      when: mount_device and state == "present"
