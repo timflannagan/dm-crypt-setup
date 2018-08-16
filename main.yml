@@ -3,20 +3,54 @@
   become: yes
 
   tasks:
-    - name: Define variables
-      include_tasks: "setup-defaults.yml"
-
-    - debug: var=ansible_mounts
-
-    - name: Print out mount info
+    - name: Setup path
       set_fact:
-        debug_info: "{{ ansible_mounts|selectattr('device', 'equalto', device_path)|first }}"
+        device_path: '/dev/foo/test2'
 
-    - debug:
-        var: debug_info
+    - name: Setup fs-type
+      set_fact:
+        fs_type: 'reiserfs'
 
-    # - name: Setup crypt device
-    #   cryptab:
-    #     name: "{{ device_name }}"
-    #     state: "{{ state }}"
-    #   when: state == "present" and device_name not in ansible_mounts.devices
+    - name: Setup device name
+      set_fact:
+        device_name: 'luks-test'
+
+    - name: Setup mount point
+      set_fact:
+        mount_point: '/opt/test10'
+
+    - name: Setup state variable
+      set_fact:
+        state: 'present'
+
+    - name: Setup default mount flag
+      set_fact:
+        mount_device: true
+
+    - name: Setup luks device
+      command: cryptsetup --verbose --batch-mode luksFormat {{ device_path }}
+      when: state == "present"
+
+    - name: Open luks device
+      command: cryptsetup luksOpen {{ device_path }} {{ device_name }}
+      when: state == "present"
+
+    - name: Create fs signature
+      filesystem:
+        dev: "/dev/mapper/{{ device_name }}"
+        fstype: "{{ fs_type }}"
+      when: state == "present"
+
+    - name: Stat the created device
+      stat:
+        path: '/dev/mapper/{{ device_name }}'
+      register: device_status
+      when: state == "present"
+
+    - name: Mount luks device
+      mount:
+        src: "/dev/mapper/{{ device_name }}"
+        path: "{{ mount_point }}"
+        fstype: "{{ fs_type }}"
+        state: "{{ state }}"
+      when: mount_device and state == "present" and device_status.exists
