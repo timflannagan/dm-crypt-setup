@@ -1,4 +1,0 @@
----
-# defaults file for role
-fs_type: 'ext4'
-state: 'present'
