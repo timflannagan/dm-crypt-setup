@@ -1,0 +1,25 @@
+---
+- set_fact:
+    device_path: '/dev/mapper/{{ lvm_vg }}-{{ lvm_device_name }}'
+  when: lvm_vg and device_name
+
+- name: Check if device already exists
+  stat:
+    path: "/dev/mapper/{{ device_name }}"
+  register: device_status
+
+- set_fact:
+    state: 'absent'
+  when: device_status.stat.exists
+
+# tasks file for role
+- name: Setup crypt device
+  include_tasks: "create-device.yml"
+  when: state == "present"
+
+- name: Remove crypt device
+  include_tasks: "remove-device.yml"
+  when: state == "absent"
+
+- name: Update facts
+  setup:

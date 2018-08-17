@@ -1,0 +1,15 @@
+---
+- hosts: localhost
+  remote_user: root
+
+  roles:
+  tasks:
+    - include_role:
+        name: ../role
+      vars:
+        lvm_device_name: 'test2'
+        device_name: 'luks-test'
+        lvm_vg: 'foo'
+        mount_point: /mnt'
+        fs_type: 'ext4'
+        state: 'present'
