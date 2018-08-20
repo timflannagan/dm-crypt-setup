@@ -1,0 +1,17 @@
+---
+# To-Do: place in a block rescue 
+- name: Remove key from volume group
+  expect:
+    command: cryptsetup -q luksRemoveKey {{ device_path }}
+    responses:
+      "Enter passphrase .*:": "thisisecure"
+
+# To-Do: place in a block rescue
+- name: Remove {{ dm_path }}
+  expect:
+    command: cryptsetup -q remove {{ dm_path }}
+    responses:
+      "Enter passphrase .*:": "thisisecure"
+
+- name: Wipe fs signature
+  shell: wipefs --all {{ device_path }}

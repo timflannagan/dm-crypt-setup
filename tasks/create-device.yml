@@ -1,17 +1,15 @@
 ---
-- set_fact:
-    pass_response:
-      "Enter passphrase for {{ device_path }}:": "ThisIsSecure"
-
 - name: Setup luks device
   expect:
     command: cryptsetup -q luksFormat {{ device_path }}
-    responses: "{{ pass_response }}"
+    responses:
+      "Enter passphrase for .*:": "thisisecure"
 
 - name: Open luks device
   expect:
     command: cryptsetup -q luksOpen {{ device_path }} {{ device_name }}
-    responses: "{{ pass_response }}"
+    responses:
+      "Enter passphrase for .*:":  "thisisecure"
 
 - name: Create fs signature
   filesystem:
@@ -23,4 +21,4 @@
     src: "/dev/mapper/{{ device_name }}"
     path: "{{ mount_point }}"
     fstype: "{{ fs_type }}"
-    state: "{{ state }}"
+    state: "mounted"

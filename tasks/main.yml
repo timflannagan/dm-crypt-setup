@@ -3,10 +3,18 @@
     device_path: '/dev/mapper/{{ lvm_vg }}-{{ lvm_device_name }}'
   when: lvm_vg and device_name
 
+# To-Do: fix this as device might have different passcode
 - name: Check if device already exists
   stat:
     path: "/dev/mapper/{{ device_name }}"
   register: device_status
+
+- name: Debug stat output
+  debug:
+    var: device_status
+
+- set_fact:
+    dm_path: "/dev/mapper/{{ device_name }}"
 
 - set_fact:
     state: 'absent'
@@ -18,7 +26,7 @@
   when: state == "present"
 
 - name: Remove crypt device
-  include_tasks: "remove-device.yml"
+  include_tasks: "absent-device.yml"
   when: state == "absent"
 
 - name: Update facts
