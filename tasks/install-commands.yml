@@ -1,0 +1,10 @@
+---
+- name: Install cryptsetup
+  package:
+    name: cryptsetup
+    state: present
+
+- name: Install dmsetup
+  package:
+    name: dmsetup
+    state: present 

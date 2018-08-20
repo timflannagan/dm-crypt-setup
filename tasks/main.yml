@@ -3,6 +3,10 @@
     device_path: '/dev/mapper/{{ lvm_vg }}-{{ lvm_device_name }}'
   when: lvm_vg and device_name
 
+- name: Install dependencies as needed
+  include_tasks: 'install-commands.yml'
+  when: install_dep
+
 # To-Do: fix this as device might have different passcode
 - name: Check if device already exists
   stat:
