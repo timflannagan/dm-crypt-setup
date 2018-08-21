@@ -2,14 +2,20 @@
 - hosts: localhost
   remote_user: root
 
-  roles:
+  vars_prompt:
+    - name: "passcode"
+      prompt: "Enter password for crypt device"
+      private: yes
+      encrypt: "sha512_crypt"
+      salt_size: 7
+      salt: "foo"
+
   tasks:
     - include_role:
         name: ../role
       vars:
-        lvm_device_name: 'test2'
-        device_name: 'luks-test'
+        lvm_device_name: 'test1'
+        device_name: 'luks-home'
         lvm_vg: 'foo'
-        mount_point: /mnt'
+        mount_point: '/mnt'
         fs_type: 'ext4'
-        state: 'present'

@@ -3,9 +3,6 @@
     device_path: '/dev/mapper/{{ lvm_vg }}-{{ lvm_device_name }}'
   when: lvm_vg and device_name
 
-- set_fact:
-    passcode: "thisissecure"
-
 - name: Install dependencies as needed
   include_tasks: 'install-commands.yml'
   when: install_dep
