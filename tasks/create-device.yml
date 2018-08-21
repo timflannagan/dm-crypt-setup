@@ -3,13 +3,13 @@
   expect:
     command: cryptsetup -q luksFormat {{ device_path }}
     responses:
-      "Enter passphrase for .*:": "thisisecure"
+      "Enter passphrase for .*:": "{{ passcode }}"
 
 - name: Open luks device
   expect:
     command: cryptsetup -q luksOpen {{ device_path }} {{ device_name }}
     responses:
-      "Enter passphrase for .*:":  "thisisecure"
+      "Enter passphrase for .*:":  "{{ passcode }}"
 
 - name: Create fs signature
   filesystem:
