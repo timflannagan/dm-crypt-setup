@@ -13,6 +13,7 @@ To-Do:
 
 Notes:
 ======
-1. Ansible's **crypttab** module seems fairly useless.
+1. Ansible's `crypttab` module seems fairly useless.
 2. Can't use variables as keys in Ansible.
 3. Expect/response block will time out if variable is used as key in response control.
+4. Using `cat` or `echo` with the passcode and piping it into the `cryptsetup` command has not worked
