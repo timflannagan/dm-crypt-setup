@@ -3,3 +3,19 @@
   package:
     name: cryptsetup
     state: present
+
+- name: Install xfs tools as needed
+  package:
+    name: xfsprogs
+    state: present
+  when: fs_type == "xfs"
+
+- name: Install ext4 tools as needed
+  package:
+    name: e4fsprogs
+    state: present
+
+- name: Install reisenfs tools as needed
+  package:
+    name: reisenfs-utils
+    state: present
